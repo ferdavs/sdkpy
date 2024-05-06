@@ -12,7 +12,7 @@ Rust:
   env_vars:
     - RUSTUP_HOME: ".rustup"
     - CARGO_HOME: ".cargo"
-    - Path: ".cargo/bin"
+    - Path: ".cargo\\bin"
 
 Node:
   env_vars:
