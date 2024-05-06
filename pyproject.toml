@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "sdkpy"
+version = "0.0.1"
+description = "SDK management"
+authors = ["Feruz Davletov"]
+license = "GPLv3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pyyaml = "^6.0.1"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

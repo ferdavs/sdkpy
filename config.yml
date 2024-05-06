@@ -1,0 +1,19 @@
+Java:
+  env_vars:
+    - JAVA_HOME
+    - JDK_HOME
+    - Path: "bin"
+
+Git:
+  env_vars:
+    - Path: "bin"
+
+Rust:
+  env_vars:
+    - RUSTUP_HOME: ".rustup"
+    - CARGO_HOME: ".cargo"
+    - Path: ".cargo/bin"
+
+Node:
+  env_vars:
+    - Path: 
