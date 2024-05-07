@@ -11,17 +11,13 @@ class SDKToolManager:
         self.config_path = os.path.join(base_dir, config_path)
         self.sdk_configs = self.load_config()
 
-    def read_config(self, config_path):
-        with open(config_path, "r") as file:
-            return yaml.safe_load(file)
-
     def load_config(self):
         try:
             with open(self.config_path, "r") as file:
                 config = yaml.safe_load(file)
                 for sdk, details in config.items():
-                    if 'dir' not in details:
-                        details['dir'] = sdk  # Default dir to SDK name if not provided
+                    if "dir" not in details:
+                        details["dir"] = sdk  # Default dir to SDK name if not provided
                 print(f"Configuration loaded from {self.config_path}")
                 return config
         except FileNotFoundError:
@@ -33,7 +29,6 @@ class SDKToolManager:
 
     def set_sdk(self, sdk_name, version):
         self.env_manager.backup("env_backup.json")
-
         try:
             if sdk_name not in self.sdk_configs:
                 raise ValueError(f"SDK configuration for {sdk_name} is not available.")
@@ -48,25 +43,26 @@ class SDKToolManager:
                 os.symlink(sdk_path, symlink_path, target_is_directory=True)
 
             for item in sdk_config["env_vars"]:
-                if isinstance(item, dict):
-                    for var, value in item.items():
-                        if var.lower() == "path":
-                            if value:
-                                self._update_path(os.path.join(symlink_path, value))
-                            else:
-                                self._update_path(symlink_path)
-                        else:
-                            full_path = (
-                                os.path.join(symlink_path, value)
-                                if not os.path.isabs(value)
-                                else value
-                            )
-                            self.env_manager.set_var(var, full_path)
-                elif isinstance(item, str):
-                    if item.lower() == "path":
-                        self._update_path(symlink_path)
-                    else:
-                        self.env_manager.set_var(item, symlink_path)
+                var_name = item["name"]
+                var_value = item["value"]
+                var_type = item["type"]
+
+                if var_name.lower() == "path":
+                    path_to_add = (
+                        os.path.join(symlink_path, var_value)
+                        if var_value
+                        else symlink_path
+                    )
+                    self._update_path(path_to_add)
+                elif var_type == "path":
+                    full_path = (
+                        os.path.join(symlink_path, var_value)
+                        if var_value
+                        else symlink_path
+                    )
+                    self.env_manager.set_var(var_name, full_path)
+                elif var_type == "flag":
+                    self.env_manager.set_var(var_name, var_value)
 
         except Exception as e:
             print(f"Error occurred: {e}")
@@ -74,24 +70,51 @@ class SDKToolManager:
             raise
 
     def remove_sdk(self, sdk_name):
-        config = self.read_config(self.config_path)
-        if sdk_name not in config:
+        if sdk_name not in self.sdk_configs:
             return
-        path_var = self.env_manager.get_var("Path")
+        self.env_manager.backup("env_backup.json")
+        try:
+            sdk_config = self.sdk_configs[sdk_name]
+            sdk_dir = os.path.join(self.base_dir, sdk_config["dir"])
+            path_var = self.env_manager.get_var("Path")
 
-        path_values = [
-            path
-            for path in path_var.split(os.pathsep)
-            if sdk_name not in path and path != self.base_dir
-        ]
-        updated_path = os.pathsep.join(path_values)
-        self.env_manager.set_var("Path", updated_path)
-        sdk_config = config[sdk_name].get("env_vars", [])
-        for var in sdk_config:
-            var = next(iter(var.keys())) if isinstance(var, dict) else var
-            if var.lower() == "path":
-                continue
-            self.env_manager.remove_var(var)
+            # Filter out any path segments that include the SDK directory
+            path_values = [
+                path for path in path_var.split(os.pathsep) if sdk_dir not in path
+            ]
+            updated_path = os.pathsep.join(path_values)
+            self.env_manager.set_var("Path", updated_path)
+
+            # Remove other environment variables set by this SDK
+            for item in sdk_config["env_vars"]:
+                var_name = item["name"]
+                if var_name.lower() != "path":  # We've already handled PATH separately
+                    self.env_manager.remove_var(var_name)
+
+        except Exception as e:
+            print(f"Error occurred during SDK removal: {e}")
+            self.env_manager.restore("env_backup.json")
+            raise
+
+    def _update_path(self, new_path_segment):
+        current_path = self.env_manager.get_var("Path")
+        if current_path is None:
+            current_path = ""
+
+        path_parts = current_path.split(os.pathsep) if current_path else []
+
+        if new_path_segment not in path_parts:
+            path_parts.append(new_path_segment)
+            updated_path = os.pathsep.join(path_parts)
+            self.env_manager.set_var("Path", updated_path)
+
+    def _remove_path(self, path_segment):
+        current_path = self.env_manager.get_var("Path")
+        if current_path:
+            path_parts = current_path.split(os.pathsep)
+            path_parts = [path for path in path_parts if path != path_segment]
+            updated_path = os.pathsep.join(path_parts)
+            self.env_manager.set_var("Path", updated_path)
 
     def list_versions(self, sdk_name):
         if sdk_name not in self.sdk_configs:
@@ -101,13 +124,15 @@ class SDKToolManager:
         versions = [
             d
             for d in os.listdir(sdk_dir)
-            if os.path.isdir(os.path.join(sdk_dir, d)) and d.startswith(os_prefix) and not d.endswith("_current")
+            if os.path.isdir(os.path.join(sdk_dir, d))
+            and d.startswith(os_prefix)
+            and not d.endswith("_current")
         ]
         return versions
-    
+
     def list_sdks(self):
         return list(self.sdk_configs.keys())
-    
+
     def get_os_suffix(self):
         return self.get_os_prefix() + "_current"
 
@@ -121,16 +146,3 @@ class SDKToolManager:
             return "mac"
         else:
             raise ValueError("Unsupported operating system")
-
-    def _update_path(self, new_path_segment):
-        current_path = self.env_manager.get_var("Path")
-        if current_path is None:
-            current_path = ""
-
-        path_parts = current_path.split(os.pathsep) if current_path else []
-
-        # Append the new path segment if it's not already in the Path
-        if new_path_segment not in path_parts:
-            path_parts.append(new_path_segment)
-            updated_path = os.pathsep.join(path_parts)
-            self.env_manager.set_var("Path", updated_path)
