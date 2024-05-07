@@ -6,6 +6,9 @@ authors = ["Feruz Davletov"]
 license = "GPLv3"
 readme = "README.md"
 
+[tool.poetry.scripts]
+sdkpy = "sdkpy.cli:main"
+
 [tool.poetry.dependencies]
 python = "^3.12"
 pyyaml = "^6.0.1"
