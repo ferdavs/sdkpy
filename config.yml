@@ -18,8 +18,12 @@ Git:
 
 Rust:
   env_vars:
-    - RUSTUP_HOME: ".rustup"
-    - CARGO_HOME: ".cargo"
+    - name: RUSTUP_HOME
+      value: ".rustup"
+      type: path
+    - name: CARGO_HOME
+      value: ".cargo"
+      type: path
     - name: Path
       value: ".cargo\\bin"
       type: path
