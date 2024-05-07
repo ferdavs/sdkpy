@@ -17,3 +17,19 @@ Rust:
 Node:
   env_vars:
     - Path: 
+
+Flutter:
+  env_vars:
+    - Path: "bin"
+
+Android:
+  env_vars:
+    - ANDROID_HOME
+    - Path: "platform-tools"
+    - Path: "tools"
+    - Path: "tools\\bin"
+
+Maven:
+  env_vars:
+    - M2_HOME: "..\\.m2"
+    - Path: "bin"

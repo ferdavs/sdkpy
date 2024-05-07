@@ -71,7 +71,7 @@ class WinEnv(OSEnv):
         reg.DeleteValue(key, name)
         reg.CloseKey(key)
         # Notify the system about the removal
-        os.system('setx {} ""'.format(name))
+        # os.system('setx {} ""'.format(name))
         self.notify_system_environment_change()
 
     def backup(self, file_path):

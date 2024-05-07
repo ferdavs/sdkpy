@@ -11,6 +11,10 @@ class SDKToolManager:
         self.config_path = os.path.join(base_dir, config_path)
         self.sdk_configs = self.load_config()
 
+    def read_config(self, config_path):
+        with open(config_path, "r") as file:
+            return yaml.safe_load(file)
+
     def load_config(self):
         try:
             with open(self.config_path, "r") as file:
@@ -68,6 +72,26 @@ class SDKToolManager:
             print(f"Error occurred: {e}")
             self.env_manager.restore("env_backup.json")
             raise
+
+    def remove_sdk(self, sdk_name):
+        config = self.read_config(self.config_path)
+        if sdk_name not in config:
+            return
+        path_var = self.env_manager.get_var("Path")
+
+        path_values = [
+            path
+            for path in path_var.split(os.pathsep)
+            if sdk_name not in path and path != self.base_dir
+        ]
+        updated_path = os.pathsep.join(path_values)
+        self.env_manager.set_var("Path", updated_path)
+        sdk_config = config[sdk_name].get("env_vars", [])
+        for var in sdk_config:
+            var = next(iter(var.keys())) if isinstance(var, dict) else var
+            if var.lower() == "path":
+                continue
+            self.env_manager.remove_var(var)
 
     def list_versions(self, sdk_name):
         if sdk_name not in self.sdk_configs:
