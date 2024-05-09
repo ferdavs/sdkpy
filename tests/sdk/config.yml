@@ -1,20 +1,15 @@
 Java:
   env_vars:
     - name: JAVA_HOME
-      value:
-      
     - name: JDK_HOME
-      value:
-      
+    
     - name: Path
       value: "bin"
-      
 
 Git:
   env_vars:
     - name: Path
       value: "bin"
-      
 
 Rust:
   env_vars:
@@ -31,19 +26,15 @@ Rust:
 Node:
   env_vars:
     - name: Path
-      value:
-      
 
 Flutter:
   env_vars:
     - name: Path
       value: "bin"
-      
 
 Android:
   env_vars:
     - name: ANDROID_HOME
-      value:
       
     - name: Path
       value: "platform-tools"
@@ -64,10 +55,9 @@ Maven:
     - name: M2_OPTS
       value: "-Xms256m -Xmx512m"
       type: flag
-      
+
     - name: Path
       value: "bin"
-      
 
 Gradle:
   env_vars:
@@ -81,8 +71,6 @@ Gradle:
 Cuda:
   env_vars:
     - name: CUDA_PATH
-      value:
-      
     - name: Path
       value: "bin"
       
@@ -90,8 +78,6 @@ Cuda:
 R:
   env_vars:
     - name: R_HOME
-      value:
-      
     - name: Path
       value: "bin"
       

@@ -49,7 +49,7 @@ class SDKToolManager(ConfigLoader):
 
             for item in sdk_config["env_vars"]:
                 var_name = item["name"]
-                var_value = item["value"]
+                var_value = item.get("value", None)
                 var_type = item.get("type", "path")
 
                 if var_name.upper() == "PATH":  # PATH is handled separately
