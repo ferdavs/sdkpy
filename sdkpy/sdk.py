@@ -4,12 +4,9 @@ import platform
 import yaml
 
 
-class SDKToolManager:
-    def __init__(self, env_manager, base_dir, config_path):
-        self.env_manager = env_manager
-        self.base_dir = base_dir
-        self.config_path = os.path.join(base_dir, config_path)
-        self.sdk_configs = self.load_config()
+class ConfigLoader:
+    def __init__(self, config_path):
+        self.config_path = config_path
 
     def load_config(self):
         try:
@@ -26,6 +23,14 @@ class SDKToolManager:
         except yaml.YAMLError as exc:
             print(f"Error parsing the YAML file: {exc}")
             return {}
+
+
+class SDKToolManager(ConfigLoader):
+    def __init__(self, env_manager, base_dir, config_path="config.yml"):
+        self.env_manager = env_manager
+        self.base_dir = base_dir
+        self.config_path = os.path.join(base_dir, config_path)
+        self.sdk_configs = self.load_config()
 
     def set_sdk(self, sdk_name, version):
         self.env_manager.backup("env_backup.json")
@@ -45,9 +50,9 @@ class SDKToolManager:
             for item in sdk_config["env_vars"]:
                 var_name = item["name"]
                 var_value = item["value"]
-                var_type = item["type"]
+                var_type = item.get("type", "path")
 
-                if var_name.lower() == "path":
+                if var_name.upper() == "PATH":  # PATH is handled separately
                     path_to_add = (
                         os.path.join(symlink_path, var_value)
                         if var_value
@@ -146,3 +151,12 @@ class SDKToolManager:
             return "mac"
         else:
             raise ValueError("Unsupported operating system")
+
+
+class SDKInstaller(ConfigLoader):
+    """Download and install SDKs from the internet."""
+
+    def __init__(self, base_dir, config_path):
+        self.base_dir = base_dir
+        self.config_path = os.path.join(base_dir, config_path)
+        self.sdk_configs = self.load_config()

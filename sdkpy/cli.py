@@ -10,7 +10,6 @@ parser.add_argument("--sdk", help="The SDK to use")
 parser.add_argument(
     "--version",
     help="The version of the SDK to use. If not set highest version will be used",
-    default=None,
 )
 parser.add_argument("--path", help="The path to the SDK")
 parser.add_argument("--list", help="List all available SDKs", action="store_true")
@@ -25,7 +24,7 @@ def main():
     if not args.path:
         print("Please provide a path to the SDK")
         exit()
-    sdk_manager = SDKToolManager(env_manager, args.path, "config.yml")
+    sdk_manager = SDKToolManager(env_manager, args.path)
 
     if args.list:
         print("Available SDKs:", sdk_manager.list_sdks())
@@ -56,3 +55,9 @@ def main():
         else:
             print("Please provide a SDK to remove")
         exit()
+
+
+if __name__ == "__main__":
+    sdk_manager = SDKToolManager(env_manager, "D:\\Sdk")
+    versions = sdk_manager.list_versions("Gradle")
+    sdk_manager.set_sdk("Gradle", versions[-1])

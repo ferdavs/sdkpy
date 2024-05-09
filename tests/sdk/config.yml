@@ -2,86 +2,96 @@ Java:
   env_vars:
     - name: JAVA_HOME
       value:
-      type: path
+      
     - name: JDK_HOME
       value:
-      type: path
+      
     - name: Path
       value: "bin"
-      type: path
+      
 
 Git:
   env_vars:
     - name: Path
       value: "bin"
-      type: path
+      
 
 Rust:
   env_vars:
     - name: RUSTUP_HOME
       value: ".rustup"
-      type: path
+      
     - name: CARGO_HOME
       value: ".cargo"
-      type: path
+      
     - name: Path
       value: ".cargo\\bin"
-      type: path
+      
 
 Node:
   env_vars:
     - name: Path
       value:
-      type: path
+      
 
 Flutter:
   env_vars:
     - name: Path
       value: "bin"
-      type: path
+      
 
 Android:
   env_vars:
     - name: ANDROID_HOME
       value:
-      type: path
+      
     - name: Path
       value: "platform-tools"
-      type: path
+      
     - name: Path
       value: "tools"
-      type: path
+      
     - name: Path
       value: "tools\\bin"
-      type: path
+      
 
 
 Maven:
   env_vars:
     - name: M2_HOME
       value: "..\\.m2"
-      type: path
+      
     - name: M2_OPTS
       value: "-Xms256m -Xmx512m"
       type: flag
+      
     - name: Path
       value: "bin"
-      type: path
+      
 
 Gradle:
   env_vars:
     - name: GRADLE_HOME
       value: "..\\gradle"
-      type: path
+      
     - name: Path
       value: "bin"
-      type: path
+      
 
 Cuda:
   env_vars:
     - name: CUDA_PATH
       value:
-      type: path
+      
     - name: Path
       value: "bin"
-      type: path
+      
+
+R:
+  env_vars:
+    - name: R_HOME
+      value:
+      
+    - name: Path
+      value: "bin"
+      
