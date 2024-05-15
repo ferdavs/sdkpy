@@ -43,7 +43,7 @@ class SDKToolManager(ConfigLoader):
             sdk_dir = sdk_config["dir"]
             os_suffix = self.get_os_suffix()
             if self.get_os_prefix() == "win":
-                sdk_dir = sdk_dir.replace("/", ntpath.sep)
+                sdk_dir = sdk_dir.replace("/", os.path.sep)
 
             if version:
                 sdk_path = os.path.join(self.base_dir, sdk_dir, version)
