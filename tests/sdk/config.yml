@@ -11,6 +11,12 @@ Git:
     - name: Path
       value: "bin"
 
+VSCode:
+  dir: D:/Ide/VSCode
+  env_vars:
+    - name: Path
+      absolute: true
+     
 Rust:
   env_vars:
     - name: RUSTUP_HOME
@@ -21,7 +27,6 @@ Rust:
       
     - name: Path
       value: ".cargo\\bin"
-      
 
 Node:
   env_vars:
@@ -45,8 +50,6 @@ Android:
     - name: Path
       value: "tools\\bin"
       
-
-
 Maven:
   env_vars:
     - name: M2_HOME
@@ -74,7 +77,6 @@ Cuda:
     - name: Path
       value: "bin"
       
-
 R:
   env_vars:
     - name: R_HOME

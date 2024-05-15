@@ -16,7 +16,7 @@ parser.add_argument("--list", help="List all available SDKs", action="store_true
 parser.add_argument(
     "--list-versions", help="List all available versions of an SDK", action="store_true"
 )
-parser.add_argument("--remove", help="Remove an SDK", action="store_true")
+parser.add_argument("--remove", help="Remove a SDK", action="store_true")
 
 
 def main():
@@ -30,20 +30,16 @@ def main():
         print("Available SDKs:", sdk_manager.list_sdks())
         exit()
 
-    if args.list_versions:
-        if not args.sdk:
-            print("Please provide a SDK to list versions")
-            exit()
+    if args.list_versions and args.sdk:
         print("Available versions:", sdk_manager.list_versions(args.sdk))
         exit()
 
     if args.sdk:
         versions = sdk_manager.list_versions(args.sdk)
+        version = args.version
         if not versions:
             print(f"No versions found for {args.sdk}")
-            exit()
-        version = args.version
-        if not version:
+        else:
             version = versions[-1]
         sdk_manager.set_sdk(args.sdk, version)
         print(f"Using {args.sdk} version {version}")
@@ -58,6 +54,9 @@ def main():
 
 
 if __name__ == "__main__":
+    sdk = "VSCode"
     sdk_manager = SDKToolManager(env_manager, "D:\\Sdk")
-    versions = sdk_manager.list_versions("Gradle")
-    sdk_manager.set_sdk("Gradle", versions[-1])
+    # versions = sdk_manager.list_versions(sdk)
+    sdk_manager.set_sdk(sdk, None)
+    g = sdk_manager.env_manager.get_var("Path")
+    print(g)

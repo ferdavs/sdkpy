@@ -1,3 +1,4 @@
+import ntpath
 import os
 import platform
 
@@ -41,30 +42,42 @@ class SDKToolManager(ConfigLoader):
             sdk_config = self.sdk_configs[sdk_name]
             sdk_dir = sdk_config["dir"]
             os_suffix = self.get_os_suffix()
-            sdk_path = os.path.join(self.base_dir, sdk_dir, version)
-            symlink_path = os.path.join(self.base_dir, sdk_dir, os_suffix)
+            if self.get_os_prefix() == "win":
+                sdk_dir = sdk_dir.replace("/", ntpath.sep)
 
-            if not os.path.islink(symlink_path):
-                os.symlink(sdk_path, symlink_path, target_is_directory=True)
+            if version:
+                sdk_path = os.path.join(self.base_dir, sdk_dir, version)
+                symlink_path = os.path.join(self.base_dir, sdk_dir, os_suffix)
+
+                if not os.path.islink(symlink_path):
+                    os.symlink(sdk_path, symlink_path, target_is_directory=True)
 
             for item in sdk_config["env_vars"]:
                 var_name = item["name"]
-                var_value = item.get("value", None)
+                var_value = item.get("value", sdk_dir)
                 var_type = item.get("type", "path")
-
-                if var_name.upper() == "PATH":  # PATH is handled separately
-                    path_to_add = (
-                        os.path.join(symlink_path, var_value)
-                        if var_value
-                        else symlink_path
+                is_absolute = item.get("absolute", False)
+                if (
+                    is_absolute
+                    and not var_value
+                    and not os.path.isabs(var_value)
+                    and var_type == "path"
+                ):
+                    raise ValueError(
+                        f"Absolute path required for environment variable {var_name}"
                     )
-                    self._update_path(path_to_add)
-                elif var_type == "path":
+                if is_absolute:
+                    full_path = var_value
+                else:
                     full_path = (
                         os.path.join(symlink_path, var_value)
                         if var_value
                         else symlink_path
                     )
+
+                if var_name.upper() == "PATH":  # PATH is handled separately
+                    self._update_path(full_path)
+                elif var_type == "path":
                     self.env_manager.set_var(var_name, full_path)
                 elif var_type == "flag":
                     self.env_manager.set_var(var_name, var_value)
