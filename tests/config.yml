@@ -1,3 +1,12 @@
+Env:
+  env_vars:
+    - name: OPENAI_API_KEY
+      value: "sk-1234567890" #encrypted
+      type: secret
+    - name: TELEGRAM_API_KEY
+      value: "sk-1234567890"
+      type: secret
+  
 Java:
   env_vars:
     - name: JAVA_HOME
@@ -83,3 +92,8 @@ R:
     - name: Path
       value: "bin"
       
+rye:
+  env_vars:
+    - name: RYE_HOME
+    - name: Path
+      value: "shims"
